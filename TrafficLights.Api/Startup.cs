@@ -1,12 +1,15 @@
-using System.Reflection;
+﻿using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using TrafficLights.Core.Hubs;
 using TrafficLights.Data;
 using TrafficLights.Data.DataAccess;
@@ -26,23 +29,45 @@ namespace TrafficLights.Api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
+
+            services.AddAuthentication(opt => {
+                    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = "http://localhost:5000",
+                        ValidAudience = "http://localhost:5000",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                    };
+                });
+
+
+
+
+
+
+
             services.AddSignalR();
             services.AddDbContext<TraficLightsContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")),
             ServiceLifetime.Transient);
-            /*options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")),
-            ServiceLifetime.Transient);*/
-            //   services.AddSingleton<TrafficLight>();
-            //services.AddTransient<TrafficLight>();
             services.AddScoped<TrafficLight>();
             services.AddScoped<TrafficLightRepository>();
-            //     services.AddScoped<TraficLightsWorker>();
+
             
+
             services.AddMediatR(Assembly.GetExecutingAssembly(), Assembly.Load(("TrafficLights.Core")));
-            /*services.AddSingleton<IHostedService, Worker>();*/
             services.AddSingleton<TrafficLightsService>();
             services.AddCors(options =>
             {
@@ -54,7 +79,7 @@ namespace TrafficLights.Api
                                         .AllowAnyHeader()
                                         .AllowCredentials();
                                   });
-            });//added this
+            });
 
             services.AddControllers().AddJsonOptions(opts =>
             {
@@ -78,6 +103,7 @@ namespace TrafficLights.Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
