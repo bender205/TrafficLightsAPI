@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TrafficLights.Data;
+using TrafficLights.Model;
 using TrafficLights.Model.Auth;
 using TrafficLights.Model.Entities;
 using TrafficLights.Model.Helpers;

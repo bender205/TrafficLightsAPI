@@ -19,14 +19,7 @@ namespace TrafficLights.Data
         {
             _databaseContext = databaseContext;
         }
-
-
-        /*
-        public async Task<TrafficLightEntity> GetByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _databaseContext.Lights.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
-        }
-         */
+         
         public async Task<User> GetByCredentialsAsync(string userName, string passWord,
             CancellationToken cancellationToken)
         {

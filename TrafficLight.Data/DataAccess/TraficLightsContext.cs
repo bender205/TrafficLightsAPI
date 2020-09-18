@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TrafficLights.Model;
 using TrafficLights.Model.Entities;
 
 namespace TrafficLights.Data.DataAccess
@@ -14,9 +15,9 @@ namespace TrafficLights.Data.DataAccess
             Database.EnsureCreated();
         }
         public DbSet<TrafficLightEntity> Lights { get; set; }
-/*
+
         public DbSet<User> Users { get; set; }
-*/
+
         /* protected override void OnModelCreating(ModelBuilder modelBuilder)
          {
              modelBuilder.Entity<TrafficLightEntity>().ToTable("TraficLights");
