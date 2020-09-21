@@ -41,6 +41,7 @@ namespace TrafficLights.Api
             services.AddScoped<TrafficLight>();
             services.AddScoped<TrafficLightRepository>();
             services.AddScoped<AuthRepository>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddMediatR(Assembly.GetExecutingAssembly(), Assembly.Load(("TrafficLights.Core")));
             services.AddSingleton<TrafficLightsService>();

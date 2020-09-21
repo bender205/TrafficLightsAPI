@@ -10,7 +10,7 @@ using TrafficLights.Data.DataAccess;
 namespace TrafficLights.Data.Migrations
 {
     [DbContext(typeof(TraficLightsContext))]
-    [Migration("20200921112225_new-Identity-whith-JWT")]
+    [Migration("20200921113047_new-Identity-whith-JWT")]
     partial class newIdentitywhithJWT
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

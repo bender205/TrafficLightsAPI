@@ -3,40 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TrafficLights.Data.Migrations
 {
-    public partial class Identityinitial : Migration
+    public partial class newIdentitywhithJWT : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_RefreshToken_User_UserId",
-                table: "RefreshToken");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_User",
-                table: "User");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_TraficLights",
-                table: "TraficLights");
-
-            migrationBuilder.RenameTable(
-                name: "User",
-                newName: "Users");
-
-            migrationBuilder.RenameTable(
-                name: "TraficLights",
-                newName: "Lights");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Users",
-                table: "Users",
-                column: "Id");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Lights",
-                table: "Lights",
-                column: "Id");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -69,13 +39,25 @@ namespace TrafficLights.Data.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    Login = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true)
+                    AccessFailedCount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lights",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Color = table.Column<int>(maxLength: 10, nullable: false),
+                    Date = table.Column<DateTime>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lights", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,6 +166,32 @@ namespace TrafficLights.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RefreshToken",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(nullable: true),
+                    Expires = table.Column<DateTime>(nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    CreatedByIp = table.Column<string>(nullable: true),
+                    Revoked = table.Column<DateTime>(nullable: true),
+                    RevokedByIp = table.Column<string>(nullable: true),
+                    ReplacedByToken = table.Column<string>(nullable: true),
+                    UserIdentityEntityId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshToken_AspNetUsers_UserIdentityEntityId",
+                        column: x => x.UserIdentityEntityId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -223,21 +231,14 @@ namespace TrafficLights.Data.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_RefreshToken_Users_UserId",
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshToken_UserIdentityEntityId",
                 table: "RefreshToken",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                column: "UserIdentityEntityId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_RefreshToken_Users_UserId",
-                table: "RefreshToken");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -254,44 +255,16 @@ namespace TrafficLights.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Lights");
+
+            migrationBuilder.DropTable(
+                name: "RefreshToken");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Users",
-                table: "Users");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Lights",
-                table: "Lights");
-
-            migrationBuilder.RenameTable(
-                name: "Users",
-                newName: "User");
-
-            migrationBuilder.RenameTable(
-                name: "Lights",
-                newName: "TraficLights");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_User",
-                table: "User",
-                column: "Id");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_TraficLights",
-                table: "TraficLights",
-                column: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_RefreshToken_User_UserId",
-                table: "RefreshToken",
-                column: "UserId",
-                principalTable: "User",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }
