@@ -20,13 +20,14 @@ namespace TrafficLights.Data
             _databaseContext = databaseContext;
         }
          
-        public async Task<User> GetByCredentialsAsync(string userName, string passWord,
+        public async Task<UserIdentityEntity> GetByCredentialsAsync(string userName, string passWord,
             CancellationToken cancellationToken)
         {
             return await _databaseContext.Users.FirstOrDefaultAsync(
-                (x => x.Username == userName && x.Password == passWord), cancellationToken);
+                (x => x.UserName == userName && x.PasswordHash == passWord), cancellationToken);
+            throw new NotImplementedException();
         }
-        public async Task<User> GetByTokenAsync(string token, CancellationToken cancellationToken)
+        public async Task<UserIdentityEntity> GetByTokenAsync(string token, CancellationToken cancellationToken)
         {
             return await _databaseContext.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
         }
@@ -35,17 +36,17 @@ namespace TrafficLights.Data
             await _databaseContext.SaveChangesAsync(cancellationToken);
         }
 
-        public void Update(User user)
+        public void Update(UserIdentityEntity user)
         {
-            _databaseContext.Users.Update(user);
+           _databaseContext.Users.Update(user);
         }
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<UserIdentityEntity>> GetAllAsync()
         {
             return await Task.Run(() => _databaseContext.Users);
         }
-        public async Task<User> GetByIdAsync(int id)
-        {
-            return await _databaseContext.Users.FindAsync(id);
+        public async Task<UserIdentityEntity> GetByIdAsync(int id)
+        {          
+              return await _databaseContext.Users.FindAsync(id);
         }
     }
 }

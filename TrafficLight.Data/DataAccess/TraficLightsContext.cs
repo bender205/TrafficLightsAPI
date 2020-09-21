@@ -12,11 +12,12 @@ namespace TrafficLights.Data.DataAccess
     {
         public TraficLightsContext(DbContextOptions<TraficLightsContext> options) : base(options)
         {
-            Database.EnsureCreated();
+       //     Database.EnsureCreated();
         }
         public DbSet<TrafficLightEntity> Lights { get; set; }
 
-        public DbSet<User> Users { get; set; }
+      //  public DbSet<User> Users { get; set; }
+    //    public DbSet<UserIdentityEntity> Users { get; set; }
 
         /* protected override void OnModelCreating(ModelBuilder modelBuilder)
          {

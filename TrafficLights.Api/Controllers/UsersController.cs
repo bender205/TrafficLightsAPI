@@ -35,28 +35,68 @@ namespace TrafficLights.Api.Controllers
         }
 
 
+        [AllowAnonymous]
+        //[HttpPost("authenticate")]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] AuthenticateRequest model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
+            if (result.Succeeded)
+            {
+                var response = await _userService.GetAuthenticateResponceTokensAsync(user, IpAddress());
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(new { message = "Username or password is incorrect" });
+            }
+
+        }
+
+
 
         [AllowAnonymous]
-        [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest model)
+        [HttpPost("register")]
+        //TODO check if this user already exist
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
-            var response = await _userService.AuthenticateAsync(model, IpAddress());
+            if (ModelState.IsValid)
+            {
+                UserIdentityEntity user = new UserIdentityEntity { Email = model.Email, UserName = model.Email };
+                // добавляем пользователя
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    /*// установка куки
+                    await _signInManager.SignInAsync(user, false);
+                    return RedirectToAction("Index", "Home");*/
+                    return Ok("Registered successfully");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return BadRequest(result.Errors);
+                }
 
-            if (response == null)
-                return BadRequest(new {message = "Username or password is incorrect"});
-
-            return Ok(response);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RevokeTokenRequest token)
         {
-
             var response = await _userService.RefreshTokenAsync(token.Token, IpAddress());
 
             if (response == null)
-                return Unauthorized(new {message = "Invalid token"});
+                return Unauthorized(new { message = "Invalid token" });
 
             return Ok(response.RefreshToken);
         }
@@ -68,14 +108,14 @@ namespace TrafficLights.Api.Controllers
             var token = model.Token;
 
             if (string.IsNullOrEmpty(token))
-                return BadRequest(new {message = "Token is required"});
+                return BadRequest(new { message = "Token is required" });
 
             var response = await _userService.RevokeTokenAsync(token, IpAddress());
 
             if (!response)
-                return NotFound(new {message = "Token not found"});
+                return NotFound(new { message = "Token not found" });
 
-            return Ok(new {message = "Token revoked"});
+            return Ok(new { message = "Token revoked" });
         }
 
 

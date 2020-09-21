@@ -8,7 +8,7 @@ namespace TrafficLights.Model.Auth
     public class AuthenticateRequest
     {
         [Required]
-        public string Username { get; set; }
+        public string UserName { get; set; }
 
         [Required]
         public string Password { get; set; }

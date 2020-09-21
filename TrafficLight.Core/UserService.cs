@@ -21,11 +21,11 @@ namespace TrafficLights.Core
 {
     public interface IUserService
     {
-        Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress);
+        Task<AuthenticateResponse> GetAuthenticateResponceTokensAsync(UserIdentityEntity user, string ipAddress);
         Task<AuthenticateResponse> RefreshTokenAsync(string token, string ipAddress);
         Task<bool> RevokeTokenAsync(string token, string ipAddress);
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<User> GetByIdAsync(int id);
+        Task<IEnumerable<UserIdentityEntity>> GetAllAsync();
+        Task<UserIdentityEntity> GetByIdAsync(int id);
     }
 
     public class UserService : IUserService
@@ -41,12 +41,13 @@ namespace TrafficLights.Core
             _appSettings = appSettings.Value;
         }
 
-        public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest model, string ipAddress)
-        {
-            var user = await _repository.GetByCredentialsAsync(model.Username, model.Password, CancellationToken.None);
 
-            // return null if user not found
-            if (user == null) return null;
+        
+        public async Task<AuthenticateResponse> GetAuthenticateResponceTokensAsync(UserIdentityEntity user, string ipAddress)
+        {
+           // var user = await _repository.GetByCredentialsAsync(userEntity.UserName, userEntity.PasswordHash, CancellationToken.None);
+
+        //    if (user == null) return null;
 
             // authentication successful so generate jwt and refresh tokens
             var jwtToken = generateJwtToken(user);
@@ -59,6 +60,9 @@ namespace TrafficLights.Core
 
             return new AuthenticateResponse(user, jwtToken, refreshToken.Token);
         }
+
+      
+
 
         public async Task<AuthenticateResponse> RefreshTokenAsync(string token, string ipAddress)
         {
@@ -108,19 +112,19 @@ namespace TrafficLights.Core
             return true;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<UserIdentityEntity>> GetAllAsync()
         {
             return await _repository.GetAllAsync();
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<UserIdentityEntity> GetByIdAsync(int id)
         {
             return await _repository.GetByIdAsync(id);
         }
 
         // helper methods
 
-        private string generateJwtToken(User user)
+        private string generateJwtToken(UserIdentityEntity user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -152,5 +156,7 @@ namespace TrafficLights.Core
                 };
             }
         }
+
+       
     }
 }
